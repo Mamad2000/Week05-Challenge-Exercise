@@ -10,18 +10,8 @@ var hour2pm = $('#hour-14');
 var hour3pm = $('#hour-15'); 
 var hour4pm = $('#hour-16'); 
 var hour5pm = $('#hour-17'); 
-var saveButton = $('.fas');
 
 
-// Give the timeblock hours
-hour9am.text = ('9');
-hour10am.text = ('10');
-hour12am.text = ('12');
-hour1pm.text = ('13');
-hour2pm.text = ('14');
-hour3pm.text = ('15');
-hour4pm.text = ('16');
-hour5pm.text = ('17');
 
 
 
@@ -42,17 +32,17 @@ $(function () {
   // Create a variable x that starts at 0
   var x = 0;
   // Use event listener on click
-  saveButton.on('click', function () {
-    // TODO: We want the x value to end when it reaches the user seleted time-block 
-    while (x < 9) {
-      // We need to use DOM traversal to reach the #hour-x attribute
-      var temp = rootEl.children('div').children('div').eq(x);
-      console.log(temp);
-      // Now we set them to local storage
-      localStorage.setItem('hour-x', JSON.stringify(temp));
-
-      x++;
-    }
+  $('.saveBtn').on('click', function () {
+    // We want the x value to end when it reaches the user seleted time-block 
+    console.log($(this));
+    // Instead of this you could use event.target, but event must be placed in function()
+    console.log($(this)[0].previousElementSibling.value);
+    console.log($(this)[0].previousElementSibling.id);
+    //Get the object from local storage, if empty just set to {}
+    var hourObj = JSON.parse(localStorage.getItem('calendar')) || {};
+    hourObj[$(this)[0].previousElementSibling.id] = $(this)[0].previousElementSibling.value; 
+    // Now we set them to local storage
+    localStorage.setItem('calendar',JSON.stringify(hourObj));
   });
 
   // TODO: Add code to apply the past, present, or future class to each time
@@ -75,6 +65,18 @@ $(function () {
   var currentDayHour = dayjs().format('H');
   console.log(currentDayHour);
 
+  for (var i = 9; i < 18; i++) {
+    if (i < currentDayHour) {
+        $('#hour-' + i).addClass('past')
+    }
+    if (i == currentDayHour) {
+      $('#hour-' + i).addClass('present')
+    }
+    if (i > currentDayHour) {
+      $('#hour-' + i).addClass('future')
+    }
+  }
+
   // Each timeblock is color coded to indicate whether we're in the 
   // past, present or future.
   // We must compare the time-block the with curentDayHour.
@@ -83,7 +85,7 @@ $(function () {
   var curr = $('.present').text;
   console.log(curr)
   // if curentDayHour is less than 
-  debugger
+  // debugger
   if (curr.isBefore(currentDayHour)) {
     temp.addClass('past');
   } else if (curr.isSame(currentDayHour)) {
